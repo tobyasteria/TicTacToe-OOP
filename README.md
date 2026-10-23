@@ -22,4 +22,4 @@ Week 2: `IPlayer`, `HumanPlayer`, `ComputerPlayer`, `Game` and playable console 
 Week 3: undo using a move-history stack, more tests, improvements.
 Week 4: final report, evidence, demo and oral defense.
 
-See `docs/Weekly_Report_01.md`, `docs/UML.md`, and `docs/AI_Usage_Log.md`.
+
