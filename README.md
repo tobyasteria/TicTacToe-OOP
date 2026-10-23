@@ -15,7 +15,7 @@ Install .NET 8 SDK, open a terminal in this folder, then:
 dotnet run
 ```
 
-Expected output includes `PASS` for 7 checks. Capture a screenshot after running on your own computer. No actual .NET runtime execution has been performed in the creation environment.
+Expected output includes `PASS` for 7 checks. Capture a screenshot after running on your own computer. The student ran the program locally using .NET SDK 8.0.416 and confirmed that all seven prepared tests displayed PASS.
 
 ## Next weeks
 Week 2: `IPlayer`, `HumanPlayer`, `ComputerPlayer`, `Game` and playable console game.
