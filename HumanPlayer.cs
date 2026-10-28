@@ -2,13 +2,20 @@ using System;
 
 public class HumanPlayer : IPlayer
 {
-    public Move GetMove(Board board, char symbol)
+    public char Symbol { get; }
+
+    public HumanPlayer(char symbol)
+    {
+        if (symbol != 'X' && symbol != 'O')
+            throw new ArgumentException("Symbol must be X or O.");
+
+        Symbol = symbol;
+    }
+
+    public Move GetMove(Board board)
     {
         if (board == null)
             throw new ArgumentNullException(nameof(board));
-
-        if (symbol != 'X' && symbol != 'O')
-            throw new ArgumentException("Symbol must be X or O.");
 
         while (true)
         {
@@ -21,7 +28,7 @@ public class HumanPlayer : IPlayer
                 continue;
             }
 
-            return new Move(row, col, symbol);
+            return new Move(row, col, Symbol);
         }
     }
 
@@ -35,8 +42,11 @@ public class HumanPlayer : IPlayer
             if (input == null)
                 throw new InvalidOperationException("No input was provided.");
 
-            if (int.TryParse(input, out int value) && value >= 1 && value <= 3)
+            if (int.TryParse(input, out int value) &&
+                value >= 1 && value <= 3)
+            {
                 return value - 1;
+            }
 
             Console.WriteLine("Please enter a number from 1 to 3.");
         }
