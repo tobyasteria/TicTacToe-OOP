@@ -1,3 +1,4 @@
+
 using System;
 using System.Collections.Generic;
 
@@ -5,8 +6,25 @@ public class ComputerPlayer : IPlayer
 {
     private Random random = new Random();
 
-    public Move GetMove(Board board, char symbol)
+    public char Symbol { get; }
+
+    public ComputerPlayer(char symbol)
     {
+        if (symbol != 'X' && symbol != 'O')
+        {
+            throw new ArgumentException("Symbol must be X or O.");
+        }
+
+        Symbol = symbol;
+    }
+
+    public Move GetMove(Board board)
+    {
+        if (board == null)
+        {
+            throw new ArgumentNullException(nameof(board));
+        }
+
         List<Move> emptyCells = new List<Move>();
 
         for (int row = 0; row < 3; row++)
@@ -15,7 +33,7 @@ public class ComputerPlayer : IPlayer
             {
                 if (board.GetCell(row, col) == ' ')
                 {
-                    emptyCells.Add(new Move(row, col, symbol));
+                    emptyCells.Add(new Move(row, col, Symbol));
                 }
             }
         }
