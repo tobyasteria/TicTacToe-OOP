@@ -1,27 +1,39 @@
 
-# Tic-Tac-Toe OOP — Week 2 (C#)
+# Tic-Tac-Toe OOP — Week 3 (C#)
 
-A C# console application extending Week 1 to build a fully playable Tic-Tac-Toe game using Object-Oriented Programming (OOP) principles.
+A console-based Tic-Tac-Toe game developed in C# (.NET 8) using Object-Oriented Programming principles and the Command Design Pattern.
 
-Week 2 introduces the `IPlayer` interface, supporting both Human vs Human and Human vs Computer gameplay modes, while keeping the original Week 1 tests.
+## Features
 
-## Files
+- Human vs Human gameplay.
+- Human vs Computer gameplay with random legal moves.
+- Input validation for coordinates and occupied cells.
+- Automatic turn switching.
+- Win and draw detection.
+- Undo functionality using Command Pattern.
+- Move history managed using a Stack (LIFO).
+- Automated tests for core logic, players, and Undo.
 
-- `Move.cs`: Stores move coordinates (row, column) and player symbol.
-- `Board.cs`: Manages the board state, move placement, validation, and console display.
-- `GameRules.cs`: Checks winning conditions (rows, columns, diagonals) and draw detection.
-- `IPlayer.cs`: Defines the common interface for player types.
-- `HumanPlayer.cs`: Handles keyboard input and validates player coordinates.
-- `ComputerPlayer.cs`: Selects a random legal move from available empty cells.
-- `Game.cs`: Controls the game loop, turn switching, and win/draw checking.
-- `Program.cs`: Provides the main menu and starts the selected game mode.
-- `Week1Tests.cs`: Contains the seven original tests from Week 1.
+## Project Structure
+
+- `Move.cs`: Stores move coordinates and player symbol.
+- `Board.cs`: Manages the board and supports placing/removing moves.
+- `GameRules.cs`: Checks winning and drawing conditions.
+- `IPlayer.cs`: Interface for different player types.
+- `HumanPlayer.cs`: Handles human player input.
+- `ComputerPlayer.cs`: Selects random legal moves.
+- `IGameCommand.cs`: Interface defining Execute() and Undo().
+- `PlaceMoveCommand.cs`: Encapsulates move execution and reversal.
+- `Game.cs`: Controls the game loop, turns, and move history.
+- `Program.cs`: Console menu and test launcher.
+- `Week1Tests.cs`: Seven original core tests.
+- `PlayerTests.cs`: Three player-related tests.
+- `UndoTests.cs`: Five Undo tests.
 
 ## How to Run
 
 Requirements:
 - .NET 8 SDK
-- Visual Studio Code or another C# development environment
 
 Open a terminal in the project folder and run:
 
@@ -31,33 +43,68 @@ dotnet run
 
 ## Menu Options
 
-1. **Human vs Human** — Two human players take turns using X and O.
-2. **Human vs Computer** — A human player (X) plays against a computer (O).
-3. **Run Week 1 Tests** — Runs the original seven tests to verify core functionality.
+1. Human vs Human
+2. Human vs Computer
+3. Run Week 1 Tests
+4. Run Week 3 Undo Tests
+5. Run Week 2 Player Tests
 
-Players enter row and column numbers from 1 to 3.
+## How to Use Undo
 
-## Week 2 Features
+During a game, when the Undo prompt appears:
 
-- Human vs Human gameplay.
-- Human vs Computer gameplay with random legal moves.
-- Player abstraction using the `IPlayer` interface.
-- Polymorphism through `HumanPlayer` and `ComputerPlayer`.
-- Input validation for invalid coordinates and occupied cells.
-- Automatic turn switching.
-- Win and draw detection.
-- Regression testing using the Week 1 test cases.
+- Enter `U` to undo.
+- Press Enter to continue playing.
 
-## Test Evidence
+**Human vs Human:** Undo removes the most recent move and restores the previous player's turn.
 
-- [Week 1 Test Results](docs/week1-test-result.png)
-- [Week 2 UML Class Diagram](docs/UML.md)
+**Human vs Computer:** Undo removes the latest human and computer moves, allowing the human player to play again.
+
+Undo is available during an active game, before a win or draw ends the game.
+
+## Design Patterns
+
+### Command Pattern
+
+The Command Pattern is implemented using:
+
+- `IGameCommand`: Declares `Execute()` and `Undo()`.
+- `PlaceMoveCommand`: Implements move execution and reversal.
+- `Game`: Stores successful commands in `Stack<IGameCommand>`.
+
+The most recently executed command is undone first (LIFO).
+
+### Polymorphism
+
+`HumanPlayer` and `ComputerPlayer` implement `IPlayer`, allowing `Game` to interact with both player types through the same interface.
+
+## Testing
+
+| Test Suite | Number of Tests |
+|---|---|
+| Week 1 Tests | 7 |
+| Week 2 Player Tests | 3 |
+| Week 3 Undo Tests | 5 |
+| Total | 15 |
+
+Test results must be confirmed by running the corresponding menu options.
+
+## Evidence
+
+Gameplay screenshots and testing evidence are stored in the `docs/` folder.
+
+- [UML Class Diagram](docs/UML.md)
 - [AI Usage Log](docs/AI_Usage_Log.md)
+- [Undo Tests](docs/week3-undo-tests.png)
+- [Human vs Human Undo](docs/week3-human-vs-human-undo.png)
+- [Human vs Computer Undo](docs/week3-human-vs-computer-undo.png)
+- [Multiple Undo](docs/week3-multiple-undo.png)
+- [Player Tests](docs/week3-player-tests.png)
 
-Additional Week 2 gameplay screenshots are stored in the `docs/` folder.
+## Week 4 Plan
 
-## Next Weeks
-
-**Week 3:** Implement undo using a move-history stack, improve testing, and refine the code structure.
-
-**Week 4:** Complete the final report, code cleanup, test evidence, and oral defense preparation.
+- Improve test coverage and edge-case handling.
+- Refactor code where necessary.
+- Complete final documentation and UML.
+- Prepare the final demonstration and oral defense.
+```
