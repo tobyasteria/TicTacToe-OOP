@@ -1,6 +1,6 @@
-# Tic-Tac-Toe UML — Command Pattern and Undo
+# Tic-Tac-Toe OOP — UML Class Diagram (Week 3)
 
-This UML describes the classes and methods currently implemented in the project. The Command Pattern is used to execute a move and reverse it when the player chooses Undo.
+This document describes the implemented C# (.NET 8) architecture, including the Command Pattern used for Undo.
 
 ## 1. Class Diagram
 
@@ -11,21 +11,18 @@ classDiagram
         +char Symbol
         +GetMove(Board board) Move
     }
-
     class HumanPlayer {
         +char Symbol
         +HumanPlayer(char symbol)
         +GetMove(Board board) Move
         -ReadCoordinate(string name) int
     }
-
     class ComputerPlayer {
         -Random random
         +char Symbol
         +ComputerPlayer(char symbol)
         +GetMove(Board board) Move
     }
-
     class Game {
         -Board board
         -GameRules rules
@@ -38,7 +35,6 @@ classDiagram
         -UndoLastTurn() void
         -SwitchPlayer() void
     }
-
     class Board {
         -char[,] cells
         +Board()
@@ -47,25 +43,21 @@ classDiagram
         +RemoveMove(int row, int col) bool
         +PrintBoard() void
     }
-
     class Move {
         +int Row
         +int Col
         +char Symbol
         +Move(int row, int col, char symbol)
     }
-
     class GameRules {
         +IsWinner(Board board, char symbol) bool
         +IsDraw(Board board) bool
     }
-
     class IGameCommand {
         <<interface>>
         +Execute() bool
         +Undo() void
     }
-
     class PlaceMoveCommand {
         -Board board
         -Move move
@@ -78,112 +70,105 @@ classDiagram
     IPlayer <|.. HumanPlayer
     IPlayer <|.. ComputerPlayer
     IGameCommand <|.. PlaceMoveCommand
-
-    Game --> IPlayer : player1, player2, currentPlayer
+    Game --> IPlayer : manages players
     Game *-- Board : owns
     Game *-- GameRules : owns
-    Game "1" --> "0..*" IGameCommand : moveHistory (Stack)
-    Game ..> PlaceMoveCommand : creates for each move
-    PlaceMoveCommand --> Board : PlaceMove / RemoveMove
-    PlaceMoveCommand --> Move : stores move
-    Board ..> Move : places move
-    HumanPlayer ..> Board : reads cells
-    HumanPlayer ..> Move : returns a move
+    Game --> IGameCommand : history (Stack)
+    Game ..> PlaceMoveCommand : creates
+    PlaceMoveCommand --> Board : executes/removes move
+    PlaceMoveCommand --> Move : stores
+    Board ..> Move : places
+    GameRules ..> Board : checks
+    HumanPlayer ..> Board : checks occupied cells
     ComputerPlayer ..> Board : finds empty cells
-    ComputerPlayer ..> Move : returns a move
-    GameRules ..> Board : checks cells
 ```
 
 ## 2. Command Pattern Roles
 
-| Role | Implemented class | Responsibility |
+| Role | Component | Responsibility |
 |---|---|---|
-| Invoker | `Game` | Creates a `PlaceMoveCommand`, calls `Execute()`, and stores successful commands in `moveHistory`. |
-| Command interface | `IGameCommand` | Defines `Execute()` and `Undo()`. |
-| Concrete command | `PlaceMoveCommand` | Stores the target `Board` and `Move`. `Execute()` places the move; `Undo()` removes it if the command was executed. |
-| Receiver | `Board` | Owns the cells and provides `PlaceMove()` and `RemoveMove()`. |
-| Command history | `Stack<IGameCommand>` in `Game` | Stores successful moves. `Pop()` makes Undo follow LIFO order. |
+| Command | `IGameCommand` | Defines `Execute()` and `Undo()` |
+| Concrete Command | `PlaceMoveCommand` | Stores a move and executes/reverses it |
+| Receiver | `Board` | Changes cells through `PlaceMove()` and `RemoveMove()` |
+| Invoker | `Game` | Creates commands and invokes execution/undo |
+| History | `Stack<IGameCommand>` | Tracks successful moves in LIFO order |
 
-## 3. Sequence Diagram — Execute a Move
+## 3. Move Execution Sequence
 
 ```mermaid
 sequenceDiagram
-    participant Game
-    participant Player as currentPlayer (IPlayer)
-    participant Command as PlaceMoveCommand
-    participant Board
-    participant History as moveHistory
-    participant Rules as GameRules
-
-    Game->>Player: GetMove(board)
-    Player-->>Game: Move
-    Game->>Command: Create(board, move)
-    alt move.Symbol matches currentPlayer.Symbol
-        Game->>Command: Execute()
-        Command->>Board: PlaceMove(move)
-        Board-->>Command: true or false
-        Command-->>Game: execution result
-        alt command executed successfully
-            Game->>History: Push(command)
-            Game->>Rules: IsWinner(board, symbol)
-            Rules-->>Game: winner or no winner
+    participant G as Game
+    participant P as IPlayer
+    participant C as PlaceMoveCommand
+    participant B as Board
+    participant H as Stack history
+    participant R as GameRules
+    G->>P: GetMove(board)
+    P-->>G: move
+    G->>C: new PlaceMoveCommand(board, move)
+    alt move symbol matches current player
+        G->>C: Execute()
+        C->>B: PlaceMove(move)
+        B-->>C: true/false
+        C-->>G: success/failure
+        alt success
+            G->>H: Push(command)
+            G->>R: IsWinner(board, symbol)
             opt no winner
-                Game->>Rules: IsDraw(board)
-                Rules-->>Game: draw or not draw
+                G->>R: IsDraw(board)
             end
-            opt no winner and not draw
-                Game->>Game: SwitchPlayer()
+            opt no winner and no draw
+                G->>G: SwitchPlayer()
             end
-        else invalid or occupied cell
-            Game-->>Game: Show invalid move message
+        else invalid move
+            G->>G: Display error; retry turn
         end
-    else symbol does not match current player
-        Game-->>Game: Show invalid move message
+    else wrong symbol
+        G->>G: Display error; retry turn
     end
 ```
 
-## 4. Sequence Diagram — Undo
+## 4. Undo Sequence
 
 ```mermaid
 sequenceDiagram
-    participant Game
-    participant History as moveHistory (Stack)
-    participant Command as PlaceMoveCommand
-    participant Board
-
-    Game->>Game: UndoLastTurn()
-    alt history is empty
-        Game-->>Game: Print "No moves to undo."
-    else history contains moves
-        Note over Game: Human vs Human: undo 1 move
-        Note over Game: Human vs Computer: undo up to 2 moves
-        loop for each move to undo
-            Game->>History: Pop()
-            History-->>Game: most recent command
-            Game->>Command: Undo()
-            Command->>Board: RemoveMove(move.Row, move.Col)
-            Board-->>Command: true or false
-            opt move removed successfully
-                Command->>Command: executed = false
-            end
-            Game->>Game: SwitchPlayer()
+    participant G as Game
+    participant H as Stack history
+    participant C as IGameCommand
+    participant B as Board
+    G->>G: UndoLastTurn()
+    alt no saved moves
+        G->>G: Print "No moves to undo."
+    else saved moves exist
+        Note over G: Human vs Human: undo 1 move
+        Note over G: Human vs Computer: undo up to 2 moves
+        loop per command to undo
+            G->>H: Pop()
+            H-->>G: latest command
+            G->>C: Undo()
+            Note over C,B: PlaceMoveCommand calls Board.RemoveMove()
+            C->>B: RemoveMove(row, col)
+            B-->>C: true/false
+            G->>G: SwitchPlayer()
         end
-        Game-->>Game: Print "Undo successful!"
+        G->>G: Print "Undo successful!"
     end
 ```
 
-## 5. Undo Behavior in the Current Code
+## 5. Implemented Behavior and Limitations
 
-- Only successful move commands are pushed onto `moveHistory`.
-- `UndoLastTurn()` pops the newest command first, so commands are undone in Last-In, First-Out (LIFO) order.
-- In Human vs Human mode, Undo reverses one move.
-- In Human vs Computer mode, Undo reverses up to two moves, depending on how many commands are in history.
-- `PlaceMoveCommand.Undo()` calls `Board.RemoveMove()` only when its command has been executed.
-- An empty history prints `No moves to undo.` and returns without changing the board.
+- A command is pushed onto the history stack only after its `Execute()` succeeds.
+- Undo reverses the most recent successful command first (LIFO).
+- Human vs Human undoes one move and restores the turn.
+- Human vs Computer undoes up to two moves at a time, restoring the human player's turn in normal play.
+- If history is empty, no move is changed and a message is displayed.
+- Undo is offered at a separate prompt during an active game, not after a win/draw has ended the game.
+- `Board` still handles console rendering; separation of presentation is future work.
 
-## 6. Other OOP Relationships
+## 6. Testing
 
-- **Encapsulation:** `Board` keeps its `cells` array private and changes board state through its methods.
-- **Polymorphism:** `Game` works with `IPlayer` references, which can refer to either `HumanPlayer` or `ComputerPlayer`.
-- **Command Pattern:** `Game` can store and undo commands through `IGameCommand` without needing the history to depend on command implementation details.
-- **Separation of responsibilities:** `Board` manages cells, `GameRules` checks wins and draws, player classes provide moves, and `Game` manages turns and Undo.
+- `Week1Tests.cs`: 7 core checks.
+- `PlayerTests.cs`: 3 player-related checks.
+- `UndoTests.cs`: 5 Undo checks; uses reflection to access private Game members for tests.
+
+Test outcomes are reported separately based on actual execution, not inferred from this UML.
