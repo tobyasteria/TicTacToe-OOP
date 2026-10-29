@@ -10,6 +10,7 @@ class Program
         Console.WriteLine("2. Human vs Computer");
         Console.WriteLine("3. Run Week 1 Tests");
         Console.WriteLine("4. Run Week 3 Undo Tests");
+        Console.WriteLine("5. Run Week 2 Player Tests");
         Console.Write("Choose mode: ");
 
         string? choice = Console.ReadLine();
@@ -23,6 +24,12 @@ class Program
         if (choice == "4")
         {
             UndoTests.Run();
+            return;
+        }
+
+        if (choice == "5")
+        {
+            PlayerTests.Run();
             return;
         }
 
