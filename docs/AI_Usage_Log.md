@@ -68,3 +68,57 @@ Các chức năng HumanPlayer, ComputerPlayer, Game Loop và Undo sẽ được 
 - Áp dụng Polymorphism thông qua interface `IPlayer` trong class `Game`.
 
 AI được sử dụng để tham khảo cách thiết kế, tạo code mẫu và hỗ trợ sửa lỗi. Nhóm đã kiểm tra, điều chỉnh, tích hợp chương trình và chạy thử thực tế trước khi cập nhật repository.
+
+
+# AI USAGE LOG — WEEK 3
+
+**Đề tài:** Tic-Tac-Toe OOP Game Engine  
+**Công cụ AI:** ChatGPT  
+**Ngôn ngữ lập trình:** C# (.NET 8)  
+**Chủ đề:** Undo Functionality Using Command Pattern
+
+## 1. Nội dung AI hỗ trợ
+
+- Đề xuất kiến trúc Command Pattern gồm `IGameCommand`, `PlaceMoveCommand`, `Game` và `Board`.
+- Hướng dẫn sử dụng `Stack<IGameCommand>` để lưu lịch sử nước đi theo nguyên tắc LIFO.
+- Hướng dẫn tạo và tích hợp chức năng Undo trong `Game.cs`, bao gồm xử lý chuyển lượt.
+- Đề xuất phương thức `RemoveMove(int row, int col)` để hỗ trợ hoàn tác.
+- Cung cấp mã mẫu và hướng dẫn xây dựng năm bài kiểm thử Undo.
+- Hỗ trợ tích hợp `UndoTests.cs` và `PlayerTests.cs` vào menu `Program.cs`.
+
+## 2. Công việc sinh viên thực hiện
+
+**Lương Anh Hào (25110017):**
+
+- Xem xét và đưa `IGameCommand.cs`, `PlaceMoveCommand.cs` vào project.
+- Tích hợp Command Pattern và lịch sử nước đi vào `Game.cs`.
+- Triển khai chức năng Undo và khôi phục lượt chơi.
+- Kiểm thử Undo trong Human vs Human, Human vs Computer và Undo liên tiếp.
+- Tích hợp `UndoTests.cs` và `PlayerTests.cs` vào menu `Program.cs`.
+- Trực tiếp chạy ba bộ kiểm thử và xác nhận 15/15 PASS.
+- Cập nhật README, lưu ảnh minh chứng và quản lý các commit trên GitHub.
+
+**Nguyễn Quốc Hào (25110018):**
+
+- Bổ sung phương thức `RemoveMove()` vào `Board.cs`.
+- Xây dựng `UndoTests.cs` với năm trường hợp kiểm thử.
+- Sử dụng Reflection trong bộ test để kiểm tra một số thành phần nội bộ của `Game`.
+- Cập nhật sơ đồ UML, bổ sung các thành phần Command Pattern và sơ đồ trình tự.
+- Commit những phần việc được giao lên repository chung.
+
+## 3. Kết quả và đánh giá
+
+- Hoàn thành chức năng Undo sử dụng Command Pattern.
+- Sử dụng `Stack<IGameCommand>` để quản lý lịch sử nước đi theo LIFO.
+- Hỗ trợ Undo một nước đi trong Human vs Human.
+- Hỗ trợ Undo tối đa hai nước đi gần nhất trong Human vs Computer.
+- Tích hợp đầy đủ ba bộ kiểm thử vào menu chương trình.
+- Kết quả kiểm thử thực tế:
+  - Week 1 Tests: 7/7 PASS.
+  - Week 2 Player Tests: 3/3 PASS.
+  - Week 3 Undo Tests: 5/5 PASS.
+  - Tổng cộng: 15/15 PASS.
+
+Nhóm đã xem xét, tích hợp code, chạy chương trình, xác nhận kết quả thực tế và lưu minh chứng trên GitHub. Những kết quả chưa được kiểm thử không được ghi nhận là PASS.
+
+**Giới hạn hiện tại:** Undo chỉ được thực hiện trong khi ván đấu đang diễn ra. Bộ kiểm thử Undo sử dụng Reflection nên còn phụ thuộc vào cấu trúc nội bộ của `Game`.
