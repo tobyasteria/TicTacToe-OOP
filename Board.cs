@@ -31,6 +31,17 @@ public class Board
         cells[move.Row, move.Col] = move.Symbol;
         return true;
     }
+    public bool RemoveMove(int row, int col)
+    {
+        if (row < 0 || row >= 3 || col < 0 || col >= 3)
+            return false;
+
+        if (cells[row, col] == ' ')
+            return false;
+
+        cells[row, col] = ' ';
+        return true;
+    }
     public void PrintBoard()
     {
         for (int row = 0; row < 3; row++)
